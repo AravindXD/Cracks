@@ -1,0 +1,9 @@
+streamlit
+torch
+torchvision
+numpy
+opencv-python-headless
+Pillow
+segmentation-models-pytorch
+gdown
+streamlit_carousel
