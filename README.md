@@ -1,1 +1,22 @@
-# Cracks
+
+# Crack Segmentation Multi-Model Comparison
+[![Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://segment-cracks.streamlit.app/)
+
+This Streamlit application allows users to compare multiple deep learning models for crack segmentation in images. Users can upload single or multiple images, or even a zip file containing images, and see the segmentation results from different models side by side.
+
+## Features
+
+- Support for single image, multiple image, and zip file uploads![alt text](image.png)
+- Comparison of five different [segmentation](https://drive.google.com/drive/folders/1lO5lbg8K0qEqXvMA4bPif28Fs7T_YcJJ?usp=share_link) models:
+    1. CrackFusionNet
+    2. UnetSEResnet50: U-Net with SE-ResNet50 encoder
+    3. UnetPlusPlusResNet18: U-Net++ with ResNet18 encoder
+    4. DeepLabV3+: DeepLabV3+ with ResNet18 encoder
+    5. FPN: Feature Pyramid Network with ResNet18 encoder
+- Display of original images in a carousel![alt text](image-1.png)
+- Visualization of segmentation results for each model
+- Sorting of results based on total predicted crack pixels
+- Download options for segmentation results
+![alt text](image-2.png)
+
+## [Dataset](https://paperswithcode.com/dataset/khanhha-s-dataset)
