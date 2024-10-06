@@ -13,6 +13,12 @@ import base64
 from io import BytesIO
 import zipfile
 
+im = Image.open("images/cracks.png")
+st.set_page_config(
+    page_title="Crack-Segmentation",
+    page_icon=im,
+)
+
 def download_model_weights():
     urls = st.secrets["urls"]     
     for file_name, url in urls.items():
@@ -330,4 +336,4 @@ if uploaded_files:
                     )
                         
     st.write("Run Completed")
-
+    
