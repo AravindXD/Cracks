@@ -7,3 +7,5 @@ Pillow
 segmentation-models-pytorch
 gdown
 streamlit_carousel
+boto3
+botocore

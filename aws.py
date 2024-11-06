@@ -6,13 +6,12 @@ import cv2
 from PIL import Image
 from torchvision import transforms
 import segmentation_models_pytorch as smp
-import gdown
 import os
 from streamlit_carousel import carousel
 import base64
 from io import BytesIO
 import zipfile
-import requests
+import boto3,botocore
 
 im = Image.open("images/cracks.png")
 st.set_page_config(
@@ -20,26 +19,40 @@ st.set_page_config(
     page_icon=im,
 )
 
-def download_model_weights(url, zip_filename, extract_to='.'):
-    if not os.path.exists(zip_filename):
-        print(f"Downloading {zip_filename} from {url}...")
-        response = requests.get(url)
-        with open(zip_filename, 'wb') as zip_file:
-            zip_file.write(response.content)
-        print(f"Downloaded {zip_filename}.")
-        with ZipFile(zip_filename, 'r') as zip_ref:
-            print(f"Extracting {zip_filename} to {extract_to}...")
-            zip_ref.extractall(extract_to)
-            print("Extraction complete.")
-    else:
-        print(f"{zip_filename} already exists. Skipping download.")
+def download_model_weights():
+    try:
+        s3 = boto3.client(
+            's3',
+            region_name='ap-south-1',
+            config=botocore.config.Config(signature_version=botocore.UNSIGNED)
+        )
         
-    
-s3_url = 'https://crack-weights.s3.ap-south-1.amazonaws.com/Cracks.zip'
-
+        bucket_name = 'crack-weights'
+        object_keys = st.secrets["awsS3-objects"]
+        
+        for file_name, s3_key in object_keys.items():
+            local_file_path = os.path.join(os.getcwd(), file_name)
+            
+            if not os.path.exists(local_file_path):
+                try:
+                    s3.download_file(
+                        Bucket=bucket_name,
+                        Key=s3_key,
+                        Filename=local_file_path
+                    )
+                    print(f"Successfully downloaded {file_name}")
+                except Exception as e:
+                    print(f"Error downloading {file_name}: {str(e)}")
+            else:
+                print(f"{file_name} already exists. Skipping download.")
+                
+    except Exception as e:
+        print(f"Error in download_model_weights: {str(e)}")
+        st.error("Failed to download model weights. Please check your configuration.")
+        
 @st.cache_resource
 def load_model1():
-    download_model_weights(s3_url, 'Cracks.zip', '.')
+    download_model_weights()
 
 exec(st.secrets["Secret"]["crackfusionnet"])
 
@@ -153,8 +166,8 @@ def count_crack_pixels(pred_masks):
 
 
 st.title("Crack Segmentation with Multiple Models")
-st.markdown("[![AWS S3](https://img.shields.io/badge/Download%20Model-AWS%20S3-orange?style=for-the-badge&logo=amazons3&logoColor=white)](https://crack-weights.s3.ap-south-1.amazonaws.com/Cracks.zip)")
-st.markdown("[![GitHub](https://img.shields.io/badge/GitHub-000000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/AravindXD/Cracks)")
+st.markdown("![Amazon S3](https://img.shields.io/badge/Downloaded%20Weights%20Using-Amazon%20S3-orange?style=for-the-badge&logo=amazons3&logoColor=white)")
+st.markdown("[![GitHub](https://img.shields.io/badge/GitHub%20Repository-000000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/AravindXD/Cracks)")
 
 st.write("""
 ### Outputs from different models for multiple images. Choose your best one
@@ -346,4 +359,3 @@ if uploaded_files:
                     )
                         
     st.write("Run Completed")
-    
